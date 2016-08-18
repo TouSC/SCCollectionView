@@ -11,16 +11,19 @@
 @implementation SCCollectionView
 {
     SCCollectionViewWaterFlowLayout *waterFlowLayout;
-    SCCollectionViewBlockLayout *blockLayout;
+    UICollectionViewFlowLayout *blockLayout;
+    BOOL isRefresh;
 }
 
 - (id)initWithFrame:(CGRect)frame Type:(SCCollectionViewLayoutType)type;
 {
+    isRefresh = NO;
     waterFlowLayout = [[SCCollectionViewWaterFlowLayout alloc]init];
-    blockLayout = [[SCCollectionViewBlockLayout alloc]init];
+    blockLayout = [[UICollectionViewFlowLayout alloc]init];
     self = [super initWithFrame:frame collectionViewLayout:type==SCCollectionViewLayoutWaterFlow?waterFlowLayout:blockLayout];
     if (self)
     {
+        
         self.scrollEnabled = NO;
         self.delegate = self;
         self.dataSource = self;
@@ -39,16 +42,16 @@
 }
 - (void)refresh;
 {
+    isRefresh = YES;
     [self reloadData];
 }
-
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout minimumInteritemSpacingForSectionAtIndex:(NSInteger)section;
 {
-    return 0.1;
+    return 0;
 }
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout minimumLineSpacingForSectionAtIndex:(NSInteger)section;
 {
-    return 0.1;
+    return 0;
 }
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView;
 {
@@ -85,16 +88,13 @@
 
 -(UICollectionViewCell*)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    UICollectionViewCell *cell = [_myDelegate collectionView:self cellForItemAtIndexPath:indexPath];
-    if (indexPath.item==_size_Arr.count-1)
+    UICollectionViewCell *cell = [_myDelegate collectionView:collectionView cellForItemAtIndexPath:indexPath];
+    if ((indexPath.item==_size_Arr.count-1)&&(_size_Arr.count>0))
     {
         CGRect self_Rect = self.frame;
         self_Rect.size.height = cell.frame.size.height+cell.frame.origin.y;
         self.frame = self_Rect;
-        if (_myDelegate&&[_myDelegate respondsToSelector:@selector(collectionViewDidRefresh:)])
-        {
-            [_myDelegate collectionViewDidRefresh:self];
-        }
+        isRefresh = NO;
     }
     return cell;
 }
@@ -103,11 +103,14 @@
     UIEdgeInsets edgeInsets = {0,0,0,0};
     return edgeInsets;
 }
+
 -(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (_myDelegate&&[_myDelegate respondsToSelector:@selector(collectionView:didSelectItemAtIndexPath:)])
+    if (_myDelegate && [_myDelegate respondsToSelector:@selector(collectionView:didSelectItemAtIndexPath:)])
     {
         [_myDelegate collectionView:collectionView didSelectItemAtIndexPath:indexPath];
     }
 }
+
+
 @end

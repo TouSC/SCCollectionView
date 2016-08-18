@@ -19,7 +19,7 @@ typedef enum {
 @protocol SCCollectionViewDelegate <NSObject>
 
 -(UICollectionViewCell*)collectionView:(SCCollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath;
-
+@optional
 -(void)collectionView:(SCCollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath;
 -(void)collectionViewDidRefresh:(SCCollectionView *)collectionView;
 
